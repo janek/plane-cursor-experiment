@@ -1,73 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cursor Trace Effect</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        overflow: hidden;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            overflow: hidden;
+        }
 
-      .cursor-point {
-        position: absolute;
-        background-color: black;
-        border-radius: 50%;
-        pointer-events: none;
-        transform: translate(-50%, -50%);
-        width: 2px;
-        height: 2px;
-        opacity: 1;
-        transition: opacity 0.5s linear;
-      }
+        .cursor-point {
+            position: absolute;
+            background-color: black;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 2px;
+            opacity: 1;
+            transition: opacity 0.5s linear;
+        }
     </style>
-  </head>
-  <body>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
+</head>
+<body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
         let cursorPoints = [];
 
         class CursorPoint {
-          constructor(x, y) {
-            this.x = x;
-            this.y = y;
-            this.el = this.createPointElement();
-            document.body.appendChild(this.el);
-          }
-
-          createPointElement() {
-            const el = document.createElement("div");
-            el.className = "cursor-point";
-            el.style.left = `${this.x}px`;
-            el.style.top = `${this.y}px`;
-            return el;
-          }
-
-          fadeOut() {
-            this.el.style.opacity = parseFloat(this.el.style.opacity) - 0.02;
-            if (parseFloat(this.el.style.opacity) <= 0) {
-              this.el.remove();
-              const index = cursorPoints.indexOf(this);
-              cursorPoints.splice(index, 1);
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.el = this.createPointElement();
+                document.body.appendChild(this.el);
+                setTimeout(() => this.startFading(), 200);
             }
-          }
+
+            createPointElement() {
+                const el = document.createElement('div');
+                el.className = 'cursor-point';
+                el.style.left = `${this.x}px`;
+                el.style.top = `${this.y}px`;
+                el.style.opacity = '1';  // Setting opacity explicitly
+                return el;
+            }
+
+            startFading() {
+                this.fadeInterval = setInterval(() => {
+                    if (parseFloat(this.el.style.opacity) <= 0) {
+                        this.el.remove();
+                        const index = cursorPoints.indexOf(this);
+                        cursorPoints.splice(index, 1);
+                        clearInterval(this.fadeInterval);
+                    } else {
+                        console.log("   Fading...l" + parseFloat(this.el.style.opacity));
+                        this.el.style.opacity = parseFloat(this.el.style.opacity) - 0.02;
+                    }
+                }, 25);  // This controls how fast the fading effect is. Decrease for faster fade, increase for slower fade.
+            }
         }
 
-        document.addEventListener("mousemove", (event) => {
-          const cursorPoint = new CursorPoint(event.clientX, event.clientY);
-          cursorPoints.push(cursorPoint);
+        document.addEventListener('mousemove', (event) => {
+            const cursorPoint = new CursorPoint(event.clientX, event.clientY);
+            cursorPoints.push(cursorPoint);
         });
+    });
+</script>
 
-        function animate() {
-          cursorPoints.forEach((point) => point.fadeOut());
-          requestAnimationFrame(animate);
-        }
-
-        animate();
-      });
-    </script>
-  </body>
+</body>
 </html>
