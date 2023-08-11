@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cursor Trace Effect</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      .cursor-point {
+        position: absolute;
+        background-color: black;
+        border-radius: 50%;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        width: 2px;
+        height: 2px;
+        opacity: 1;
+        transition: opacity 0.5s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let cursorPoints = [];
+
+        class CursorPoint {
+          constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.el = this.createPointElement();
+            document.body.appendChild(this.el);
+          }
+
+          createPointElement() {
+            const el = document.createElement("div");
+            el.className = "cursor-point";
+            el.style.left = `${this.x}px`;
+            el.style.top = `${this.y}px`;
+            return el;
+          }
+
+          fadeOut() {
+            this.el.style.opacity = parseFloat(this.el.style.opacity) - 0.02;
+            if (parseFloat(this.el.style.opacity) <= 0) {
+              this.el.remove();
+              const index = cursorPoints.indexOf(this);
+              cursorPoints.splice(index, 1);
+            }
+          }
+        }
+
+        document.addEventListener("mousemove", (event) => {
+          const cursorPoint = new CursorPoint(event.clientX, event.clientY);
+          cursorPoints.push(cursorPoint);
+        });
+
+        function animate() {
+          cursorPoints.forEach((point) => point.fadeOut());
+          requestAnimationFrame(animate);
+        }
+
+        animate();
+      });
+    </script>
+  </body>
+</html>
