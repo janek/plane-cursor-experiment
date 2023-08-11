@@ -47,7 +47,9 @@
         const svg = document.getElementById("cursorLineSVG");
         const airplaneWrapper = document.getElementById("airplaneWrapper");
         const airplaneCursor = document.getElementById("airplaneCursor");
-        let lastPos = null;
+        let lastPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        let targetPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        let easeFactor = 0.13;
 
         function createLineElement(x1, y1, x2, y2) {
           const ns = "http://www.w3.org/2000/svg";
@@ -81,46 +83,52 @@
         }
 
         document.addEventListener("mousemove", (event) => {
-          if (lastPos) {
-            const dx = event.clientX - lastPos.x;
-            const dy = event.clientY - lastPos.y;
+          targetPos = { x: event.clientX, y: event.clientY };
+        });
 
-            // Store last non-zero delta values
+        function animate() {
+          if (lastPos) {
+            let dx = targetPos.x - lastPos.x;
+            let dy = targetPos.y - lastPos.y;
+
             if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+              const newPosX = lastPos.x + dx * easeFactor;
+              const newPosY = lastPos.y + dy * easeFactor;
+
+              const line = createLineElement(
+                lastPos.x,
+                lastPos.y,
+                newPosX,
+                newPosY
+              );
+              svg.appendChild(line);
+              startFading(line);
+
+              lastPos.x = newPosX;
+              lastPos.y = newPosY;
               lastDelta = { dx, dy };
             }
 
             let angle;
             if (lastDelta) {
-              // Use last non-zero delta values to calculate angle
               angle = Math.atan2(lastDelta.dy, lastDelta.dx) * (180 / Math.PI);
-              // Normalize angle to be between 0 and 360 degrees
               if (angle < 0) angle += 360;
             } else {
-              // Default to last angle if no delta values have been stored yet
               angle = lastAngle;
             }
 
-            // Smoothly transition to new angle
             angle = smoothTransition(lastAngle, angle, 1.0);
             lastAngle = angle;
 
-            // Update airplane div rotation and position
-            airplaneWrapper.style.left = event.clientX + "px";
-            airplaneWrapper.style.top = event.clientY + "px";
+            airplaneWrapper.style.left = lastPos.x + "px";
+            airplaneWrapper.style.top = lastPos.y + "px";
             airplaneCursor.style.transform = `rotate(${angle}deg) scale(2.5)`;
-
-            const line = createLineElement(
-              lastPos.x,
-              lastPos.y,
-              event.clientX,
-              event.clientY
-            );
-            svg.appendChild(line);
-            startFading(line);
+          } else {
+            lastPos = { x: targetPos.x, y: targetPos.y };
           }
-          lastPos = { x: event.clientX, y: event.clientY };
-        });
+          requestAnimationFrame(animate);
+        }
+        animate();
       });
     </script>
   </body>
