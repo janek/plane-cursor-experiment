@@ -11,62 +11,53 @@
             margin: 0;
             overflow: hidden;
         }
-
-        .cursor-point {
+        svg {
             position: absolute;
-            background-color: black;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            width: 2px;
-            height: 2px;
-            opacity: 1;
-            transition: opacity 0.5s linear;
+            top: 0;
+            left: 0;
         }
     </style>
 </head>
 <body>
 
+<svg id="cursorLineSVG" width="100%" height="100%"></svg>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        let cursorPoints = [];
+        const svg = document.getElementById('cursorLineSVG');
+        let lastPos = null;
 
-        class CursorPoint {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.el = this.createPointElement();
-                document.body.appendChild(this.el);
-                setTimeout(() => this.startFading(), 10);
-            }
+        function createLineElement(x1, y1, x2, y2) {
+            const ns = "http://www.w3.org/2000/svg";
+            const line = document.createElementNS(ns, 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', 'black');
+            line.setAttribute('stroke-width', '1');
+            line.style.opacity = '1';
+            return line;
+        }
 
-            createPointElement() {
-                const el = document.createElement('div');
-                el.className = 'cursor-point';
-                el.style.left = `${this.x}px`;
-                el.style.top = `${this.y}px`;
-                el.style.opacity = '1';  // Setting opacity explicitly
-                return el;
-            }
-
-            startFading() {
-                this.fadeInterval = setInterval(() => {
-                    if (parseFloat(this.el.style.opacity) <= 0) {
-                        this.el.remove();
-                        const index = cursorPoints.indexOf(this);
-                        cursorPoints.splice(index, 1);
-                        clearInterval(this.fadeInterval);
-                    } else {
-                        console.log("   Fading...l" + parseFloat(this.el.style.opacity));
-                        this.el.style.opacity = parseFloat(this.el.style.opacity) - 0.02;
-                    }
-                }, 5);  // This controls how fast the fading effect is. Decrease for faster fade, increase for slower fade.
-            }
+        function startFading(line) {
+            const fadeInterval = setInterval(() => {
+                if (parseFloat(line.style.opacity) <= 0) {
+                    svg.removeChild(line);
+                    clearInterval(fadeInterval);
+                } else {
+                    line.style.opacity = parseFloat(line.style.opacity) - 0.01;
+                }
+            }, 1);  // Adjust for desired fade speed
         }
 
         document.addEventListener('mousemove', (event) => {
-            const cursorPoint = new CursorPoint(event.clientX, event.clientY);
-            cursorPoints.push(cursorPoint);
+            if (lastPos) {
+                const line = createLineElement(lastPos.x, lastPos.y, event.clientX, event.clientY);
+                svg.appendChild(line);
+                startFading(line);
+            }
+            lastPos = { x: event.clientX, y: event.clientY };
         });
     });
 </script>
