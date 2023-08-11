@@ -10,21 +10,31 @@
             background-color: #f4f4f4;
             margin: 0;
             overflow: hidden;
+            cursor: none; /* Hide the default cursor */
         }
         svg {
             position: absolute;
             top: 0;
             left: 0;
         }
+        #airplaneCursor {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            user-select: none; /* Prevent text selection when dragging */
+            pointer-events: none; /* Make sure it doesn't interfere with other mouse events */
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
 
 <svg id="cursorLineSVG" width="100%" height="100%"></svg>
+<div id="airplaneCursor">✈</div> <!-- Airplane div -->
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const svg = document.getElementById('cursorLineSVG');
+        const airplane = document.getElementById('airplaneCursor');
         let lastPos = null;
 
         function createLineElement(x1, y1, x2, y2) {
@@ -48,10 +58,14 @@
                 } else {
                     line.style.opacity = parseFloat(line.style.opacity) - 0.01;
                 }
-            }, 1);  // Adjust for desired fade speed
+            }, 1);  // Adjusted for desired fade speed
         }
 
         document.addEventListener('mousemove', (event) => {
+            // Update airplane div position
+            airplane.style.left = event.clientX + "px";
+            airplane.style.top = event.clientY + "px";
+            
             if (lastPos) {
                 const line = createLineElement(lastPos.x, lastPos.y, event.clientX, event.clientY);
                 svg.appendChild(line);
