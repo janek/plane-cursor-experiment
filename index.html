@@ -1,100 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cursor Trace Effect</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            overflow: hidden;
-            cursor: none; /* Hide the default cursor */
-        }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        overflow: hidden;
+        cursor: none; /* Hide the default cursor */
+      }
 
-        svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
+      svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
 
-        #airplaneWrapper {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
+      #airplaneWrapper {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
 
-        #airplaneCursor {
-            position: relative;
-            user-select: none; /* Prevent text selection when dragging */
-            font-size: 20px;
-            transition: transform 0.2s; /* Smooth transition for rotation */
-        }
+      #airplaneCursor {
+        position: relative;
+        user-select: none; /* Prevent text selection when dragging */
+        font-size: 20px;
+        transition: transform 0.2s; /* Smooth transition for rotation */
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
+    <svg id="cursorLineSVG" width="100%" height="100%"></svg>
 
-<svg id="cursorLineSVG" width="100%" height="100%"></svg>
+    <!-- Airplane div structure -->
+    <div id="airplaneWrapper">
+      <div id="airplaneCursor">✈</div>
+    </div>
 
-<!-- Airplane div structure -->
-<div id="airplaneWrapper">
-    <div id="airplaneCursor">✈</div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const svg = document.getElementById('cursorLineSVG');
-        const airplaneWrapper = document.getElementById('airplaneWrapper');
-        const airplaneCursor = document.getElementById('airplaneCursor');
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const svg = document.getElementById("cursorLineSVG");
+        const airplaneWrapper = document.getElementById("airplaneWrapper");
+        const airplaneCursor = document.getElementById("airplaneCursor");
         let lastPos = null;
 
         function createLineElement(x1, y1, x2, y2) {
-            const ns = "http://www.w3.org/2000/svg";
-            const line = document.createElementNS(ns, 'line');
-            line.setAttribute('x1', x1);
-            line.setAttribute('y1', y1);
-            line.setAttribute('x2', x2);
-            line.setAttribute('y2', y2);
-            line.setAttribute('stroke', 'black');
-            line.setAttribute('stroke-width', '1');
-            line.style.opacity = '1';
-            return line;
+          const ns = "http://www.w3.org/2000/svg";
+          const line = document.createElementNS(ns, "line");
+          line.setAttribute("x1", x1);
+          line.setAttribute("y1", y1);
+          line.setAttribute("x2", x2);
+          line.setAttribute("y2", y2);
+          line.setAttribute("stroke", "black");
+          line.setAttribute("stroke-width", "1");
+          line.style.opacity = "1";
+          return line;
         }
 
         function startFading(line) {
-            const fadeInterval = setInterval(() => {
-                if (parseFloat(line.style.opacity) <= 0) {
-                    svg.removeChild(line);
-                    clearInterval(fadeInterval);
-                } else {
-                    line.style.opacity = parseFloat(line.style.opacity) - 0.01;
-                }
-            }, 1); // Adjusted for desired fade speed
-        }
-
-        document.addEventListener('mousemove', (event) => {
-            if (lastPos) {
-                const dx = event.clientX - lastPos.x;
-                const dy = event.clientY - lastPos.y;
-                const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-
-                // Update airplane div rotation and position
-                airplaneWrapper.style.left = event.clientX + "px";
-                airplaneWrapper.style.top = event.clientY + "px";
-                airplaneCursor.style.transform = `rotate(${angle}deg) scale(2.5)`;
-
-                const line = createLineElement(lastPos.x, lastPos.y, event.clientX, event.clientY);
-                svg.appendChild(line);
-                startFading(line);
+          const fadeInterval = setInterval(() => {
+            if (parseFloat(line.style.opacity) <= 0) {
+              svg.removeChild(line);
+              clearInterval(fadeInterval);
+            } else {
+              line.style.opacity = parseFloat(line.style.opacity) - 0.01;
             }
-            lastPos = { x: event.clientX, y: event.clientY };
+          }, 1); // Adjusted for desired fade speed
+        }
+        let lastDelta = null;
+
+        document.addEventListener("mousemove", (event) => {
+          if (lastPos) {
+            const dx = event.clientX - lastPos.x;
+            const dy = event.clientY - lastPos.y;
+
+            // Store last non-zero delta values
+            if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+              lastDelta = { dx, dy };
+            }
+
+            let angle;
+            if (lastDelta) {
+              // Use last non-zero delta values to calculate angle
+              angle = Math.atan2(lastDelta.dy, lastDelta.dx) * (180 / Math.PI);
+            } else {
+              // Default to 0 if no delta values have been stored yet
+              angle = 0;
+            }
+
+            // Update airplane div rotation and position
+            airplaneWrapper.style.left = event.clientX + "px";
+            airplaneWrapper.style.top = event.clientY + "px";
+            airplaneCursor.style.transform = `rotate(${angle}deg) scale(2.5)`;
+
+            const line = createLineElement(
+              lastPos.x,
+              lastPos.y,
+              event.clientX,
+              event.clientY
+            );
+            svg.appendChild(line);
+            startFading(line);
+          }
+          lastPos = { x: event.clientX, y: event.clientY };
         });
-    });
-</script>
-
-</body>
-
+      });
+    </script>
+  </body>
 </html>
