@@ -76,10 +76,8 @@
         let lastAngle = 0;
 
         function smoothTransition(oldAngle, newAngle, alpha) {
-          var diff = newAngle - oldAngle;
-          if (diff < -180) diff += 360;
-          if (diff > 180) diff -= 360;
-          return oldAngle * (1 - alpha) + (oldAngle + diff) * alpha;
+          var diff = ((newAngle - oldAngle + 180 + 360) % 360) - 180;
+          return oldAngle + diff * alpha;
         }
 
         document.addEventListener("mousemove", (event) => {
@@ -104,7 +102,7 @@
             }
 
             // Smoothly transition to new angle
-            angle = smoothTransition(lastAngle, angle, 0.1);
+            angle = smoothTransition(lastAngle, angle, 1.0);
             lastAngle = angle;
 
             // Update airplane div rotation and position
