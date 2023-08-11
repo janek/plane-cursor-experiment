@@ -26,14 +26,11 @@
             pointer-events: none;
         }
 
-        #airplaneInner {
-            transition: transform 0.2s; /* Smooth transition for rotation */
-        }
-
         #airplaneCursor {
             position: relative;
             user-select: none; /* Prevent text selection when dragging */
             font-size: 20px;
+            transition: transform 0.2s; /* Smooth transition for rotation */
         }
     </style>
 </head>
@@ -44,16 +41,14 @@
 
 <!-- Airplane div structure -->
 <div id="airplaneWrapper">
-    <div id="airplaneInner">
-        <div id="airplaneCursor">✈</div>
-    </div>
+    <div id="airplaneCursor">✈</div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const svg = document.getElementById('cursorLineSVG');
         const airplaneWrapper = document.getElementById('airplaneWrapper');
-        const airplaneInner = document.getElementById('airplaneInner');
+        const airplaneCursor = document.getElementById('airplaneCursor');
         let lastPos = null;
 
         function createLineElement(x1, y1, x2, y2) {
@@ -84,19 +79,18 @@
             if (lastPos) {
                 const dx = event.clientX - lastPos.x;
                 const dy = event.clientY - lastPos.y;
-                
-                if (Math.abs(dx) > 1 || Math.abs(dy) > 1) { // Only update rotation on significant movement
-                    const angle = Math.atan2(dy, dx) * (180 / Math.PI) - 45; // Subtract 45 to adjust for the initial position
-                    airplaneInner.style.transform = `rotate(${angle}deg)`;
-                }
+                const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+                // Update airplane div rotation and position
+                airplaneWrapper.style.left = event.clientX + "px";
+                airplaneWrapper.style.top = event.clientY + "px";
+                airplaneCursor.style.transform = `rotate(${angle}deg) scale(2.5)`;
 
                 const line = createLineElement(lastPos.x, lastPos.y, event.clientX, event.clientY);
                 svg.appendChild(line);
                 startFading(line);
             }
             lastPos = { x: event.clientX, y: event.clientY };
-            airplaneWrapper.style.left = event.clientX + "px";
-            airplaneWrapper.style.top = event.clientY + "px";
         });
     });
 </script>
