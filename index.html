@@ -73,6 +73,14 @@
           }, 1); // Adjusted for desired fade speed
         }
         let lastDelta = null;
+        let lastAngle = 0;
+
+        function smoothTransition(oldAngle, newAngle, alpha) {
+          var diff = newAngle - oldAngle;
+          if (diff < -180) diff += 360;
+          if (diff > 180) diff -= 360;
+          return oldAngle * (1 - alpha) + (oldAngle + diff) * alpha;
+        }
 
         document.addEventListener("mousemove", (event) => {
           if (lastPos) {
@@ -88,10 +96,16 @@
             if (lastDelta) {
               // Use last non-zero delta values to calculate angle
               angle = Math.atan2(lastDelta.dy, lastDelta.dx) * (180 / Math.PI);
+              // Normalize angle to be between 0 and 360 degrees
+              if (angle < 0) angle += 360;
             } else {
-              // Default to 0 if no delta values have been stored yet
-              angle = 0;
+              // Default to last angle if no delta values have been stored yet
+              angle = lastAngle;
             }
+
+            // Smoothly transition to new angle
+            angle = smoothTransition(lastAngle, angle, 0.1);
+            lastAngle = angle;
 
             // Update airplane div rotation and position
             airplaneWrapper.style.left = event.clientX + "px";
