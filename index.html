@@ -95,14 +95,55 @@
               const newPosX = lastPos.x + dx * easeFactor;
               const newPosY = lastPos.y + dy * easeFactor;
 
-              const line = createLineElement(
-                lastPos.x,
-                lastPos.y,
-                newPosX,
-                newPosY
+              // True distance (magnitude) of mouse move vector
+              const moveMagnitude = Math.sqrt(dx * dx + dy * dy);
+              // Normalize step vector to use for perpendicular offset calculation
+              const normalizedMoveVector = {
+                dx: dx / moveMagnitude,
+                dy: dy / moveMagnitude,
+              };
+
+              const offsetMagnitude = 10;
+              const offsetVector = {
+                dx: offsetMagnitude * -normalizedMoveVector.dy,
+                dy: offsetMagnitude * normalizedMoveVector.dx,
+              };
+
+              const startPos1 = {
+                x: lastPos.x + offsetVector.dx,
+                y: lastPos.y + offsetVector.dy,
+              };
+              const endPos1 = {
+                x: newPosX + offsetVector.dx,
+                y: newPosY + offsetVector.dy,
+              };
+
+              const startPos2 = {
+                x: lastPos.x - offsetVector.dx,
+                y: lastPos.y - offsetVector.dy,
+              };
+              const endPos2 = {
+                x: newPosX - offsetVector.dx,
+                y: newPosY - offsetVector.dy,
+              };
+
+              const line1 = createLineElement(
+                startPos1.x,
+                startPos1.y,
+                endPos1.x,
+                endPos1.y
               );
-              svg.appendChild(line);
-              startFading(line);
+              svg.appendChild(line1);
+              startFading(line1);
+
+              const line2 = createLineElement(
+                startPos2.x,
+                startPos2.y,
+                endPos2.x,
+                endPos2.y
+              );
+              svg.appendChild(line2);
+              startFading(line2);
 
               lastPos.x = newPosX;
               lastPos.y = newPosY;
