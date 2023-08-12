@@ -1,4 +1,4 @@
-<!-- The SVG and Airplane div -->
+<!-- HTML -->
 <div id="logo">
   <img src="logo.svg" width="100" />
 </div>
@@ -8,29 +8,35 @@
     <img src="plane.png" />
   </div>
 </div>
-<!-- Styles and Script -->
+
+<!-- CSS -->
 <style>
   body {
-    cursor: none; /* Hide the default cursor */
+    cursor: none;
   }
+
   svg {
     position: absolute;
     top: 0;
     left: 0;
+    pointer-events: none;
   }
+
   #airplaneWrapper {
     position: absolute;
     transform: translate(-50%, -50%);
     pointer-events: none;
   }
+
   #airplaneCursor {
     position: relative;
-    user-select: none; /* Prevent text selection when dragging */
+    user-select: none;
     font-size: 20px;
     color: black;
     transition: transform 0.2s; /* Smooth transition for rotation */
-    width: 20px; /* Width of the SVG */
-    height: 20px; /* Height of the SVG */
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
   }
 
   #airplaneCursor img {
@@ -40,10 +46,11 @@
     height: 15px;
     width: 15px;
     transform: translate(-50%, -50%) rotate(90deg);
-    /* image-rendering: -webkit-optimize-contrast; */
+    pointer-events: none;
   }
 </style>
 
+<!-- JS -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const svg = document.getElementById("cursorLineSVG");
@@ -107,7 +114,6 @@
           svg.appendChild(line);
           startFading(line);
 
-          // Create and append the second line
           const line2 = createLineElement(
             lastPos.x - 10,
             lastPos.y,
