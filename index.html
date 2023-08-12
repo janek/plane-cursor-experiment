@@ -44,6 +44,8 @@
   #airplaneCursor {
     position: relative;
     user-select: none; /* Prevent text selection when dragging */
+    font-size: 20px;
+    color: black;
     transition: transform 0.2s; /* Smooth transition for rotation */
     width: 20px; /* Width of the SVG */
     height: 20px; /* Height of the SVG */
@@ -120,6 +122,16 @@
           svg.appendChild(line);
           startFading(line);
 
+          // Create and append the second line
+          const line2 = createLineElement(
+            lastPos.x - 10,
+            lastPos.y,
+            newPosX - 10,
+            newPosY
+          );
+          svg.appendChild(line2);
+          startFading(line2);
+
           lastPos.x = newPosX;
           lastPos.y = newPosY;
           lastDelta = { dx, dy };
@@ -138,7 +150,7 @@
 
         airplaneWrapper.style.left = lastPos.x + "px";
         airplaneWrapper.style.top = lastPos.y + "px";
-        airplaneCursor.style.transform = `rotate(${angle}deg) scale(5.5)`;
+        airplaneCursor.style.transform = `rotate(${angle}deg) scale(4.5)`;
       } else {
         lastPos = { x: targetPos.x, y: targetPos.y };
       }
