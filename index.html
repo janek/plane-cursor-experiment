@@ -1,4 +1,7 @@
 <!-- The SVG and Airplane div -->
+<div id="logo">
+  <img src="logo.svg" width="100" />
+</div>
 <svg id="cursorLineSVG" width="100%" height="100%"></svg>
 <div id="airplaneWrapper">
   <div id="airplaneCursor">
@@ -9,11 +12,6 @@
 <style>
   body {
     cursor: none; /* Hide the default cursor */
-  }
-  svg {
-    position: absolute;
-    top: 0;
-    left: 0;
   }
   #airplaneWrapper {
     position: absolute;
@@ -132,7 +130,13 @@
 
         airplaneWrapper.style.left = lastPos.x + "px";
         airplaneWrapper.style.top = lastPos.y + "px";
-        airplaneCursor.style.transform = `rotate(${angle}deg) scale(4.5)`;
+        if (lastPos.x < 200 && lastPos.y < 100) {
+          airplaneCursor.style.transform = `rotate(${
+            angle * 10
+          }deg) scale(4.5)`;
+        } else {
+          airplaneCursor.style.transform = `rotate(${angle}deg) scale(4.5)`;
+        }
       } else {
         lastPos = { x: targetPos.x, y: targetPos.y };
       }
