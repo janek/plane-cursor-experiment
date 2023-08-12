@@ -90,6 +90,16 @@
           svg.appendChild(line);
           startFading(line);
 
+          // Create and append the second line
+          const line2 = createLineElement(
+            lastPos.x - 10,
+            lastPos.y,
+            newPosX - 10,
+            newPosY
+          );
+          svg.appendChild(line2);
+          startFading(line2);
+
           lastPos.x = newPosX;
           lastPos.y = newPosY;
           lastDelta = { dx, dy };
@@ -108,7 +118,7 @@
 
         airplaneWrapper.style.left = lastPos.x + "px";
         airplaneWrapper.style.top = lastPos.y + "px";
-        airplaneCursor.style.transform = `rotate(${angle}deg) scale(5.5)`;
+        airplaneCursor.style.transform = `rotate(${angle}deg) scale(4.5)`;
       } else {
         lastPos = { x: targetPos.x, y: targetPos.y };
       }
