@@ -15,6 +15,10 @@
     cursor: none;
   }
 
+  a {
+    cursor: none;
+  }
+
   svg {
     position: absolute;
     top: 0;
@@ -48,6 +52,10 @@
     transform: translate(-50%, -50%) rotate(90deg);
     pointer-events: none;
   }
+
+  .link-hovered {
+    display: none;
+  }
 </style>
 
 <!-- JS -->
@@ -59,6 +67,19 @@
     let lastPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     let targetPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     let easeFactor = 0.13;
+
+    const links = document.querySelectorAll("a");
+
+    // Add a hover event listener to each link
+    links.forEach((link) => {
+      link.addEventListener("mouseover", () => {
+        airplaneCursor.classList.add("link-hovered");
+      });
+
+      link.addEventListener("mouseout", () => {
+        airplaneCursor.classList.remove("link-hovered");
+      });
+    });
 
     function createLineElement(x1, y1, x2, y2) {
       const ns = "http://www.w3.org/2000/svg";
