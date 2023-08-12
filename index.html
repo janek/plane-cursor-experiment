@@ -30,6 +30,15 @@
         user-select: none; /* Prevent text selection when dragging */
         font-size: 20px;
         transition: transform 0.2s; /* Smooth transition for rotation */
+        width: 20px; /* Width of the SVG */
+        height: 20px; /* Height of the SVG */
+      }
+
+      #airplaneCursor svg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(90deg);
       }
     </style>
   </head>
@@ -39,7 +48,29 @@
 
     <!-- Airplane div structure -->
     <div id="airplaneWrapper">
-      <div id="airplaneCursor">✈</div>
+      <div id="airplaneCursor">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g clip-path="url(#clip0_63_31)">
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M19.9346 12.1629L11.2263 5.69686C11.2913 4.69723 11.3343 2.46515 11.2968 2.05083C10.982 -1.4223 8.78925 0.0748811 8.76812 1.62502C8.76234 2.04899 8.68526 4.24196 8.67731 5.70607L0.0760134 12.3314L0.0521224 14.4042L8.93006 10.3471L9.24753 16.7925L6.6728 18.6352L6.65574 19.9916L10.0517 19.059L10.0523 19.0702L13.4828 19.945L13.4426 18.5898L10.8367 16.793L11.0497 10.3425L19.9926 14.2318L19.9346 12.1629Z"
+              fill="black"
+            />
+          </g>
+          <defs>
+            <clipPath id="clip0_63_31">
+              <rect width="20" height="20" fill="white" />
+            </clipPath>
+          </defs>
+        </svg>
+      </div>
     </div>
 
     <script>
