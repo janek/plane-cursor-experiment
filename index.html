@@ -1,135 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cursor Trace Effect</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        overflow: hidden;
-        cursor: none; /* Hide the default cursor */
-      }
+<!-- The SVG and Airplane div -->
+<svg id="cursorLineSVG" width="100%" height="100%"></svg>
+<div id="airplaneWrapper">
+  <div id="airplaneCursor">✈</div>
+</div>
 
-      svg {
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
+<!-- Styles and Script -->
+<style>
+  body {
+    cursor: none; /* Hide the default cursor */
+  }
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  #airplaneWrapper {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  #airplaneCursor {
+    position: relative;
+    user-select: none; /* Prevent text selection when dragging */
+    font-size: 20px;
+    transition: transform 0.2s; /* Smooth transition for rotation */
+  }
+</style>
 
-      #airplaneWrapper {
-        position: absolute;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-      }
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const svg = document.getElementById("cursorLineSVG");
+    const airplaneWrapper = document.getElementById("airplaneWrapper");
+    const airplaneCursor = document.getElementById("airplaneCursor");
+    let lastPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let targetPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let easeFactor = 0.13;
 
-      #airplaneCursor {
-        position: relative;
-        user-select: none; /* Prevent text selection when dragging */
-        font-size: 20px;
-        transition: transform 0.2s; /* Smooth transition for rotation */
-      }
-    </style>
-  </head>
+    function createLineElement(x1, y1, x2, y2) {
+      const ns = "http://www.w3.org/2000/svg";
+      const line = document.createElementNS(ns, "line");
+      line.setAttribute("x1", x1);
+      line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2);
+      line.setAttribute("y2", y2);
+      line.setAttribute("stroke", "black");
+      line.setAttribute("stroke-width", "1");
+      line.style.opacity = "1";
+      return line;
+    }
 
-  <body>
-    <svg id="cursorLineSVG" width="100%" height="100%"></svg>
+    function startFading(line) {
+      const fadeInterval = setInterval(() => {
+        if (parseFloat(line.style.opacity) <= 0) {
+          svg.removeChild(line);
+          clearInterval(fadeInterval);
+        } else {
+          line.style.opacity = parseFloat(line.style.opacity) - 0.01;
+        }
+      }, 1); // Adjusted for desired fade speed
+    }
 
-    <!-- Airplane div structure -->
-    <div id="airplaneWrapper">
-      <div id="airplaneCursor">✈</div>
-    </div>
+    let lastDelta = null;
+    let lastAngle = 0;
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const svg = document.getElementById("cursorLineSVG");
-        const airplaneWrapper = document.getElementById("airplaneWrapper");
-        const airplaneCursor = document.getElementById("airplaneCursor");
-        let lastPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        let targetPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        let easeFactor = 0.13;
+    function smoothTransition(oldAngle, newAngle, alpha) {
+      var diff = ((newAngle - oldAngle + 180 + 360) % 360) - 180;
+      return oldAngle + diff * alpha;
+    }
 
-        function createLineElement(x1, y1, x2, y2) {
-          const ns = "http://www.w3.org/2000/svg";
-          const line = document.createElementNS(ns, "line");
-          line.setAttribute("x1", x1);
-          line.setAttribute("y1", y1);
-          line.setAttribute("x2", x2);
-          line.setAttribute("y2", y2);
-          line.setAttribute("stroke", "black");
-          line.setAttribute("stroke-width", "1");
-          line.style.opacity = "1";
-          return line;
+    document.addEventListener("mousemove", (event) => {
+      targetPos = { x: event.clientX, y: event.clientY };
+    });
+
+    function animate() {
+      if (lastPos) {
+        let dx = targetPos.x - lastPos.x;
+        let dy = targetPos.y - lastPos.y;
+
+        if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+          const newPosX = lastPos.x + dx * easeFactor;
+          const newPosY = lastPos.y + dy * easeFactor;
+
+          const line = createLineElement(
+            lastPos.x,
+            lastPos.y,
+            newPosX,
+            newPosY
+          );
+          svg.appendChild(line);
+          startFading(line);
+
+          lastPos.x = newPosX;
+          lastPos.y = newPosY;
+          lastDelta = { dx, dy };
         }
 
-        function startFading(line) {
-          const fadeInterval = setInterval(() => {
-            if (parseFloat(line.style.opacity) <= 0) {
-              svg.removeChild(line);
-              clearInterval(fadeInterval);
-            } else {
-              line.style.opacity = parseFloat(line.style.opacity) - 0.01;
-            }
-          }, 1); // Adjusted for desired fade speed
-        }
-        let lastDelta = null;
-        let lastAngle = 0;
-
-        function smoothTransition(oldAngle, newAngle, alpha) {
-          var diff = ((newAngle - oldAngle + 180 + 360) % 360) - 180;
-          return oldAngle + diff * alpha;
+        let angle;
+        if (lastDelta) {
+          angle = Math.atan2(lastDelta.dy, lastDelta.dx) * (180 / Math.PI);
+          if (angle < 0) angle += 360;
+        } else {
+          angle = lastAngle;
         }
 
-        document.addEventListener("mousemove", (event) => {
-          targetPos = { x: event.clientX, y: event.clientY };
-        });
+        angle = smoothTransition(lastAngle, angle, 2.0);
+        lastAngle = angle;
 
-        function animate() {
-          if (lastPos) {
-            let dx = targetPos.x - lastPos.x;
-            let dy = targetPos.y - lastPos.y;
-
-            if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-              const newPosX = lastPos.x + dx * easeFactor;
-              const newPosY = lastPos.y + dy * easeFactor;
-
-              const line = createLineElement(
-                lastPos.x,
-                lastPos.y,
-                newPosX,
-                newPosY
-              );
-              svg.appendChild(line);
-              startFading(line);
-
-              lastPos.x = newPosX;
-              lastPos.y = newPosY;
-              lastDelta = { dx, dy };
-            }
-
-            let angle;
-            if (lastDelta) {
-              angle = Math.atan2(lastDelta.dy, lastDelta.dx) * (180 / Math.PI);
-              if (angle < 0) angle += 360;
-            } else {
-              angle = lastAngle;
-            }
-
-            angle = smoothTransition(lastAngle, angle, 2.0);
-            lastAngle = angle;
-
-            airplaneWrapper.style.left = lastPos.x + "px";
-            airplaneWrapper.style.top = lastPos.y + "px";
-            airplaneCursor.style.transform = `rotate(${angle}deg) scale(2.5)`;
-          } else {
-            lastPos = { x: targetPos.x, y: targetPos.y };
-          }
-          requestAnimationFrame(animate);
-        }
-        animate();
-      });
-    </script>
-  </body>
-</html>
+        airplaneWrapper.style.left = lastPos.x + "px";
+        airplaneWrapper.style.top = lastPos.y + "px";
+        airplaneCursor.style.transform = `rotate(${angle}deg) scale(5.5)`;
+      } else {
+        lastPos = { x: targetPos.x, y: targetPos.y };
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  });
+</script>
