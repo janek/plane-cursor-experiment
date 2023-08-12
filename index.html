@@ -41,20 +41,20 @@
     transform: translate(-50%, -50%);
     pointer-events: none;
   }
-#airplaneCursor {
-  position: relative;
-  user-select: none; /* Prevent text selection when dragging */
-  transition: transform 0.2s; /* Smooth transition for rotation */
-  width: 20px; /* Width of the SVG */
-  height: 20px; /* Height of the SVG */
-}
+  #airplaneCursor {
+    position: relative;
+    user-select: none; /* Prevent text selection when dragging */
+    transition: transform 0.2s; /* Smooth transition for rotation */
+    width: 20px; /* Width of the SVG */
+    height: 20px; /* Height of the SVG */
+  }
 
-#airplaneCursor svg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(90deg);
-}
+  #airplaneCursor svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
 </style>
 
 <script>
